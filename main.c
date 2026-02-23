@@ -44,6 +44,56 @@ static int valid_move(int from, int to){
     // Must have a piece at source
     if(!piece || piece < 0) return 0;  // only white pieces
 
+    int type = j(piece);
+    int dr = (to/10) - (from/10);
+    int df = (to%10) - (from%10);
+    int ad = dr < 0 ? -dr : dr;  // absolute delta row
+    int af = df < 0 ? -df : df;  // absolute delta file
+
+    // Check piece-specific movement rules
+    if(type == 1){ // pawn
+        int fwd = 10;
+        // Forward move 1
+        if(df == 0 && to == from + fwd && !b[to]) goto valid;
+        // Forward move 2 from starting rank
+        if(df == 0 && from < 40 && to == from + 2*fwd && !b[to] && !b[from+fwd]) goto valid;
+        // Capture diagonally
+        if(af == 1 && to == from + fwd + df && b[to] && b[to] < 0) goto valid;
+        return 0;
+    } else if(type == 2){ // knight - L-shaped moves
+        int N[] = {-21, -19, -12, -8, 8, 12, 19, 21};
+        int valid = 0;
+        for(int i=0;i<8;i++) if(to == from + N[i]) valid = 1;
+        if(!valid) return 0;
+    } else if(type == 3){ // bishop - diagonal
+        if(ad != af) return 0;
+        // Check path is clear
+        int step = (dr > 0 ? 1 : -1) * 10 + (df > 0 ? 1 : -1);
+        for(int sq = from + step; sq != to; sq += step)
+            if(b[sq]) return 0;
+    } else if(type == 4){ // rook - orthogonal
+        if(dr && df) return 0;
+        // Check path is clear
+        int step = dr ? (dr > 0 ? 10 : -10) : (df > 0 ? 1 : -1);
+        for(int sq = from + step; sq != to; sq += step)
+            if(b[sq]) return 0;
+    } else if(type == 5){ // queen - diagonal or orthogonal
+        if(dr && df && ad != af) return 0;
+        // Check path is clear
+        int step = 0;
+        if(!dr) step = df > 0 ? 1 : -1;
+        else if(!df) step = dr > 0 ? 10 : -10;
+        else step = (dr > 0 ? 1 : -1) * 10 + (df > 0 ? 1 : -1);
+        for(int sq = from + step; sq != to; sq += step)
+            if(b[sq]) return 0;
+    } else if(type == 6){ // king - one square any direction
+        if(ad > 1 || af > 1) return 0;
+    }
+
+valid:
+    // Check destination has own piece (can't capture own)
+    if(b[to] > 0) return 0;
+
     // Save state
     int captured = b[to];
 
