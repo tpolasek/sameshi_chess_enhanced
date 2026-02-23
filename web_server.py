@@ -8,12 +8,12 @@ Usage:
 
 from __future__ import annotations
 
+import atexit
 import os
 import re
 import select
 import subprocess
 import threading
-import atexit
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional
 from urllib.parse import parse_qs, urlparse
@@ -22,7 +22,7 @@ ENGINE_PATH = os.environ.get("CHESS_PROGRAM", "./sameshi")
 HOST = os.environ.get("HOST", "127.0.0.1")
 PORT = int(os.environ.get("PORT", "4000"))
 READ_CHUNK_SIZE = 4096
-READ_TIMEOUT_SECONDS = 5.0
+READ_TIMEOUT_SECONDS = 300
 PROMPT = "move: "
 MOVE_RE = re.compile(r"^[a-h][1-8][a-h][1-8]$")
 
