@@ -125,6 +125,7 @@ class ChessHandler(BaseHTTPRequestHandler):
             )
             return
 
+        print(f"Got move {move}")
         try:
             delta = get_engine().send_move(move)
         except Exception as exc:  # pragma: no cover
