@@ -3,6 +3,7 @@
 #include "sameshi.h"
 
 extern int b[120], bs, bd, root_depth;
+extern int C(int s);
 
 static const char* pc(int q){
     int a=j(q);
@@ -36,6 +37,31 @@ static int sq(char f,char r){
     return (r-'0'+1)*10+(f-'a'+1);
 }
 
+// Validate player's move (white = 1)
+static int valid_move(int from, int to){
+    int piece = b[from];
+
+    // Must have a piece at source
+    if(!piece || piece < 0) return 0;  // only white pieces
+
+    // Save state
+    int captured = b[to];
+
+    // Make the move
+    b[to] = piece;
+    b[from] = 0;
+
+    // Check if white's king is in check after the move
+    int in_check = C(1);
+
+    // Undo the move
+    b[from] = piece;
+    b[to] = captured;
+
+    // Move is valid if it doesn't leave king in check
+    return !in_check;
+}
+
 int main(void){
     I();
     char m[8];
@@ -46,6 +72,10 @@ int main(void){
         if(m[0]=='q')break;
         int s=sq(m[0],m[1]),d=sq(m[2],m[3]);
         if(s<0||d<0)continue;
+        if(!valid_move(s,d)){
+            printf("Invalid move!\n");
+            continue;
+        }
         b[d]=b[s];
         b[s]=0;
         struct timespec t1,t2;
