@@ -2,7 +2,7 @@
 #include <time.h>
 #include "sameshi.h"
 
-extern int b[120], bs, bd;
+extern int b[120], bs, bd, root_depth;
 
 static const char* pc(int q){
     int a=j(q);
@@ -50,7 +50,8 @@ int main(void){
         b[s]=0;
         struct timespec t1,t2;
         clock_gettime(CLOCK_MONOTONIC,&t1);
-        int bot_depth = 5;
+        int bot_depth = 6;
+        root_depth = bot_depth;
         S(-1,bot_depth,-30000,30000);
         clock_gettime(CLOCK_MONOTONIC,&t2);
         long ms=(t2.tv_sec-t1.tv_sec)*1000+(t2.tv_nsec-t1.tv_nsec)/1000000;

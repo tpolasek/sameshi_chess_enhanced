@@ -50,7 +50,8 @@ int K[] = {-1, 1, -10, 10, -11, -9, 9, 11};
 // bs :: best move source square
 // bd :: best move destination square
 // b :: board representation (mailbox)
-int bs, bd, b[120];
+// root_depth :: the initial search depth, used to track best move only at root
+int bs, bd, b[120], root_depth;
 
 /*
 the entire program flow can be summarise like this:
@@ -211,10 +212,10 @@ int E(int s, int depth, int alpha, int beta, int from, int to, int piece, int ca
     b[from] = piece;
     b[to] = captured;
 
-    // update the best move
+    // update the best move (only at root level)
     if (score > alpha) {
         alpha = score;
-        if (depth == 5) {
+        if (depth == root_depth) {
             bs = from;
             bd = to;
         }
