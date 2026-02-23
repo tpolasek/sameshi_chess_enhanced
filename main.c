@@ -30,6 +30,7 @@ static void board(void){
     }
     printf("  └───┴───┴───┴───┴───┴───┴───┴───┘\n");
     printf("    a   b   c   d   e   f   g   h\n");
+    fflush(stdout);
 }
 
 static int sq(char f,char r){
@@ -118,12 +119,14 @@ int main(void){
     while(1){
         board();
         printf("move: ");
+        fflush(stdout);
         if(scanf("%7s",m)!=1)break;
         if(m[0]=='q')break;
         int s=sq(m[0],m[1]),d=sq(m[2],m[3]);
         if(s<0||d<0)continue;
         if(!valid_move(s,d)){
             printf("Invalid move!\n");
+            fflush(stdout);
             continue;
         }
         b[d]=b[s];
@@ -136,6 +139,7 @@ int main(void){
         clock_gettime(CLOCK_MONOTONIC,&t2);
         long ms=(t2.tv_sec-t1.tv_sec)*1000+(t2.tv_nsec-t1.tv_nsec)/1000000;
         printf("ai: %c%c%c%c (%ldms)\n",'a'+bs%10-1,'0'+bs/10-1,'a'+bd%10-1,'0'+bd/10-1,ms);
+        fflush(stdout);
         b[bd]=b[bs];
         b[bs]=0;
     }
