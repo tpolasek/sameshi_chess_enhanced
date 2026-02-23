@@ -3,26 +3,31 @@
 
 extern int b[120], bs, bd;
 
-static char pc(int q){
+static const char* pc(int q){
     int a=j(q);
-    if(!a)return '.';
-    if(a==1)return q>0?'P':'p';
-    if(a==2)return q>0?'N':'n';
-    if(a==3)return q>0?'B':'b';
-    if(a==4)return q>0?'R':'r';
-    if(a==5)return q>0?'Q':'q';
-    return q>0?'K':'k';
+    if(!a)return "·";
+    if(a==1)return q>0?"♙":"♟";
+    if(a==2)return q>0?"♘":"♞";
+    if(a==3)return q>0?"♗":"♝";
+    if(a==4)return q>0?"♖":"♜";
+    if(a==5)return q>0?"♕":"♛";
+    return q>0?"♔":"♚";
 }
 
 static void board(void){
     puts("");
-    puts("  a b c d e f g h");
+    printf("    a   b   c   d   e   f   g   h\n");
+    printf("  ┌───┬───┬───┬───┬───┬───┬───┬───┐\n");
     for(int r=9;r>=2;r--){
-        printf("%d ",r-1);
-        for(int c=1;c<=8;c++)printf("%c ",pc(b[r*10+c]));
-        printf("%d\n",r-1);
+        printf("%d │",r-1);
+        for(int c=1;c<=8;c++){
+            printf(" %s │",pc(b[r*10+c]));
+        }
+        printf(" %d\n",r-1);
+        if(r>2)printf("  ├───┼───┼───┼───┼───┼───┼───┼───┤\n");
     }
-    puts("  a b c d e f g h");
+    printf("  └───┴───┴───┴───┴───┴───┴───┴───┘\n");
+    printf("    a   b   c   d   e   f   g   h\n");
 }
 
 static int sq(char f,char r){
