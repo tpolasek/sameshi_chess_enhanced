@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include "sameshi.h"
 
 extern int b[120], bs, bd;
@@ -47,8 +48,13 @@ int main(void){
         if(s<0||d<0)continue;
         b[d]=b[s];
         b[s]=0;
-        S(-1,5,-30000,30000);
-        printf("ai: %c%c%c%c\n",'a'+bs%10-1,'0'+bs/10-1,'a'+bd%10-1,'0'+bd/10-1);
+        struct timespec t1,t2;
+        clock_gettime(CLOCK_MONOTONIC,&t1);
+        int bot_depth = 5;
+        S(-1,bot_depth,-30000,30000);
+        clock_gettime(CLOCK_MONOTONIC,&t2);
+        long ms=(t2.tv_sec-t1.tv_sec)*1000+(t2.tv_nsec-t1.tv_nsec)/1000000;
+        printf("ai: %c%c%c%c (%ldms)\n",'a'+bs%10-1,'0'+bs/10-1,'a'+bd%10-1,'0'+bd/10-1,ms);
         b[bd]=b[bs];
         b[bs]=0;
     }
