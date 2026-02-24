@@ -5,6 +5,9 @@
 extern int b[120], bs, bd, root_depth;
 extern int C(int s);
 
+static int last_ai_from = 0;
+static int last_ai_to = 0;
+
 static const char* pc(int q){
     int a=j(q);
     if(!a)return "·";
@@ -23,7 +26,13 @@ static void board(void){
     for(int r=9;r>=2;r--){
         printf("%d │",r-1);
         for(int c=1;c<=8;c++){
-            printf(" %s │",pc(b[r*10+c]));
+            int sqi = r*10+c;
+            if(sqi == last_ai_from || sqi == last_ai_to){
+                // Light gray background for AI's previous move squares.
+                printf(" \x1b[31m%s\x1b[0m │",pc(b[sqi]));
+            } else {
+                printf(" %s │",pc(b[sqi]));
+            }
         }
         printf(" %d\n",r-1);
         if(r>2)printf("  ├───┼───┼───┼───┼───┼───┼───┼───┤\n");
@@ -143,6 +152,8 @@ int main(void){
         fflush(stdout);
         b[bd]=b[bs];
         b[bs]=0;
+        last_ai_from = bs;
+        last_ai_to = bd;
         AIHistPush(bs, bd);
     }
     return 0;
