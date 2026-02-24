@@ -53,6 +53,41 @@ int K[] = {-1, 1, -10, 10, -11, -9, 9, 11};
 // root_depth :: the initial search depth, used to track best move only at root
 int bs, bd, b[120], root_depth;
 
+#define AI_MOVE_HISTORY_SIZE 10
+#define AI_REPEAT_PENALTY_UNIT 1
+
+int ai_hist_from[AI_MOVE_HISTORY_SIZE];
+int ai_hist_to[AI_MOVE_HISTORY_SIZE];
+int ai_hist_count, ai_hist_head;
+
+void AIHistReset(void) {
+    ai_hist_count = 0;
+    ai_hist_head = 0;
+    r(i, 0, AI_MOVE_HISTORY_SIZE) {
+        ai_hist_from[i] = 0;
+        ai_hist_to[i] = 0;
+    }
+}
+
+void AIHistPush(int from, int to) {
+    ai_hist_from[ai_hist_head] = from;
+    ai_hist_to[ai_hist_head] = to;
+    ai_hist_head = (ai_hist_head + 1) % AI_MOVE_HISTORY_SIZE;
+    if (ai_hist_count < AI_MOVE_HISTORY_SIZE) ai_hist_count++;
+}
+
+int AIRepeatCount(int from, int to) {
+    int repeats = 0;
+    r(i, 0, ai_hist_count) {
+        if (ai_hist_from[i] == from && ai_hist_to[i] == to) repeats++;
+    }
+    return repeats;
+}
+
+int AIRepeatPenalty(int from, int to) {
+    return AI_REPEAT_PENALTY_UNIT * AIRepeatCount(from, to);
+}
+
 /*
 the entire program flow can be summarise like this:
 
@@ -207,14 +242,16 @@ int E(int s, int depth, int alpha, int beta, int from, int to, int piece, int ca
     // we reduce thedepth if not at leaf
     // negate scores and swap alpha and beta (thats how negamax works)
     int score = -S(-s, depth ? depth - 1 : 0, -beta, -alpha);
+    int adjusted_score = score;
+    if (depth == root_depth) adjusted_score -= AIRepeatPenalty(from, to);
 
     // unmake the move
     b[from] = piece;
     b[to] = captured;
 
     // update the best move (only at root level)
-    if (score > alpha) {
-        alpha = score;
+    if (adjusted_score > alpha) {
+        alpha = adjusted_score;
         if (depth == root_depth) {
             bs = from;
             bd = to;

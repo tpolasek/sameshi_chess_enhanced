@@ -115,6 +115,7 @@ valid:
 
 int main(void){
     I();
+    AIHistReset();
     char m[8];
     while(1){
         board();
@@ -142,6 +143,7 @@ int main(void){
         fflush(stdout);
         b[bd]=b[bs];
         b[bs]=0;
+        AIHistPush(bs, bd);
     }
     return 0;
 }
