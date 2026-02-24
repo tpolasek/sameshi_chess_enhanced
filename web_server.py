@@ -4,6 +4,7 @@
 Usage:
   python3 web_server.py
   curl "http://localhost:4000/?move=e2e4"
+  curl "http://localhost:4000/reset"
 """
 
 from __future__ import annotations
@@ -81,7 +82,7 @@ class ChessEngineBridge:
             self.proc.stdin.flush()
             return self._read_until_prompt(discard=False)
 
-    def close(self) -> None:
+    def _stop_process(self) -> None:
         if self.proc is None:
             return
         if self.proc.poll() is not None:
@@ -96,6 +97,15 @@ class ChessEngineBridge:
             self.proc.kill()
         finally:
             self.proc = None
+
+    def reset(self) -> None:
+        with self.lock:
+            self._stop_process()
+            self._start_process()
+
+    def close(self) -> None:
+        with self.lock:
+            self._stop_process()
 
 
 ENGINE: Optional[ChessEngineBridge] = None
@@ -115,13 +125,22 @@ class ChessHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         params = parse_qs(parsed.query)
+        if parsed.path == "/reset" or params.get("reset", [""])[0] == "1":
+            try:
+                get_engine().reset()
+            except Exception as exc:  # pragma: no cover
+                self._send_text(500, f"Engine error: {exc}\n")
+                return
+            self._send_text(200, "Game reset\n")
+            return
+
         move = params.get("move", [""])[0]
 
         if not MOVE_RE.fullmatch(move):
             self._send_text(
                 400,
                 "Query parameter 'move' is required in long algebraic form, "
-                "for example: /?move=b2b4\n",
+                "for example: /?move=b2b4 (or call /reset to restart)\n",
             )
             return
 
