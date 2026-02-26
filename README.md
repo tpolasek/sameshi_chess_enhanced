@@ -1,4 +1,5 @@
 # sameshi
+<img width="742" height="827" alt="image" src="https://github.com/user-attachments/assets/e1420194-3b51-48e9-8e76-de5c09a78abe" />
 
 [Watch Demo Video](https://www.youtube.com/watch?v=OkoIb1OAheE)
 
